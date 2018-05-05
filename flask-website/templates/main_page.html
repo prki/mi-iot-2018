@@ -1,11 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Measuring data display</title>
+  <title>Weather station</title>
 </head>
 
 <body>
-  <h1>Sample graph</h1>
-  <img src="static/graph.png">
+  <h1>Sample temperature graph</h1>
+  <img src="static/graph_temperature.png">
+  <ul>
+    <li>Max temp: {{ maxTemp }}
+    <li>Min temp: {{ minTemp }}
+  </ul>
+
+  <h1>Sample humidity graph</h1>
+  <img src="static/graph_humidity.png">
+  <ul>
+    <li>Max temp: {{ maxHumidity }}
+    <li>Min temp: {{ minHumidity }}
+  </ul>
+
+  <h1>Sample CO in the air graph</h1>
+  <img src="static/graph_gases.png">
+  <ul>
+    <li>Max CO: {{ maxGas }}
+    <li>Min CO: {{ minGas }}
+  </ul>
 </body>
 </html>
