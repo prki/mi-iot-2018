@@ -7,25 +7,28 @@ import numpy as np
 import datetime
 
 app = Flask(__name__)
+CSVFILENAME = '../../../dev/meteo/meteo_data.csv'
 
 """
 Reads the data out of the CSV file. CSV file is formatted as
 timestamp, temperature, humidity, gas.
 """
 def readData():
-    with open('data.csv', 'r') as csvfile:
+    with open(CSVFILENAME, 'r') as csvfile:
         reader = csv.reader(csvfile)
         timestamps = []
         temps = []
         humids = []
         gases = []
+        lights = []
         for row in reader:
-            timestamps.append(int(row[0]))
-            temps.append(int(row[1]))
-            humids.append(int(row[2]))
-            gases.append(int(row[3]))
+            timestamps.append(float(row[0]))
+            temps.append(float(row[1]))
+            humids.append(float(row[2]))
+            gases.append(float(row[3]))
+            lights.append(float(row[4]))
 
-    return timestamps, temps, humids, gases
+    return timestamps, temps, humids, gases, lights
 
 
 def generateTempGraph(dates, temps):
@@ -55,18 +58,30 @@ def generateGasesGraph(dates, gases):
     plt.savefig('static/graph_gases.png')
 
 
-def generateGraphs(dates, temps, humids, gases):
+def generateLightsGraph(dates, lights):
+    plt.xlabel('Dates')
+    plt.ylabel('Light intensity [%]')
+    plt.title('Light intensity over time')
+    plt.plot(dates, lights)
+    plt.gcf().autofmt_xdate()
+    plt.savefig('static/graph_lights.png')
+
+
+def generateGraphs(dates, temps, humids, gases, lights):
+    plt.clf() # Clear figure. Important in case a figure was loaded once already.
     generateTempGraph(dates, temps)
-    plt.clf() # Clear figure
+    plt.clf()
     generateHumidGraph(dates, humids)
     plt.clf()
     generateGasesGraph(dates, gases)
+    plt.clf()
+    generateLightsGraph(dates, lights)
 
 @app.route('/')
 def main_page():
-    times, temps, humids, gases = readData()
+    times, temps, humids, gases, lights = readData()
     dates = [datetime.datetime.fromtimestamp(ts) for ts in times]
-    generateGraphs(dates, temps, humids, gases)
+    generateGraphs(dates, temps, humids, gases, lights)
 
     maxTemp = max(temps)
     minTemp = min(temps)
@@ -77,8 +92,11 @@ def main_page():
     maxGas = max(gases)
     minGas = min(gases)
 
-    return render_template('main_page.html', maxTemp=maxTemp, minTemp=minTemp, maxHumidity=maxHumidity, minHumidity=minHumidity, maxGas=maxGas, minGas=minGas)
+    maxLight = max(lights)
+    minLight = min(lights)
+
+    return render_template('main_page.html', maxTemp=maxTemp, minTemp=minTemp, maxHumidity=maxHumidity, minHumidity=minHumidity, maxGas=maxGas, minGas=minGas, maxLight=maxLight, minLight=minLight)
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=7770)
